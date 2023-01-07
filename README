@@ -1,4 +1,54 @@
+Updated Jan 7, 2023 by David Toth (david.toth@centre.edu)
+
 The files in this repo are used to conduct several aspects of virtual screens for drug discovery.  
 
-You may use and modify the files any way you wish, but they are provided with NO warranty express or implied, blah blah blah.
+If you discover you need something before I have completed this set of instructions, contact me and I'll do the best I can to prioritize getting you what you need.  That means I'll do the best I can to fill in the missing programs, clarify things that don't make sense, etc.  It does not mean I will write additional code for you or recompile autodock vina for you.  ;)
+
+Note that these scripts were written by my students and updated a bit by me.  There is no warranty, express or implied, blah blah blah.  Use what you want.  
+
+================================================================================
+
+1 We ran the ZINC-downloader-3D-pdbqt.gz.wget file (need to first make it executable with chmod +x ZINC-downloader-3D-pdbqt.gz.wget) to get the compounds we would be screening againts our target.  You may want to test different compounds, so you'll need to get your own download file from the ZINC site.  Last I knew, the most recent version was at https://zinc15.docking.org/
+
+2 Next we needed to unzip all the files we downloaded because they are a bunch of .gz files.  We moved our downloaded files into a specific folder (in our case, our folder was /chemical_libraries) that had nothing else in it.  We then copied the unzip_all.py file into that folder, navigated to the folder, and ran the command python3 unzip_all.py.
+
+3 The actions from step 2 (the previous step) unzipped the .gz files, leaving the unzipped files alongside the zipped files.  As an example, in our /chemical_libraries folder, we had the subfolder AA/AAML/ with the files AAAAML.xaa.pdbqt and AAAAML.xaa.pdbqt.gz in it.  We then need to split all the .pdbqt files that were produced in the previous step into all the individual .pdbqt files to test, as each of the .pdbqt files that were produced in the previous step contained multiple compounds that needed to be split into their own files.  We copy the split_1.py program into the /chemical_libraries folder and run the command python3 split_1.py.
+
+4 The command from step 3 created all of the individual .pdbqt files that we'll screen against our target.  Now we need to produce a file with one line per .pdbqt file, with each line being a command to run autodock vina with the particular .pdbqt file and all the appropriate parameters.  Copy the run_commands.py program into the /chemical_libraries folder and edit the program to have the appropriate path to autodock vina, the appropriate parameters, and the output file to hold the commands.  Then run the program with python3 run_commands.py.  Before you make changes, the run_commands.py program will 
+
+- write the output file to /home/toth/run.txt
+- look in /chemical_libraries and its subfolders for the .pdbqt files
+- use the program /chemical_libraries/vina_daves_version
+- have these parameters:
+    - receptor (the protein you are testing against all the .pdbqt files): /home/toth/NSP_12_nosupport.pdbqt
+    - exhaustiveness: 8
+    - cpus: 1
+    - seed 21
+    - out: the word OUT followed by the ligand being tested.  Thus, if we are testing the ligand ZINC000011616800.pdbqt, the output file is OUTZINC000011616800.pdbqt.  The path is preserved.
+    - center_x: 105.791518869
+    - center_y: 86.3353519887
+    - center_z: 79.0370232688
+    - size_x: 30.1507643113
+    - size_y: 32.4340164565
+    - size_z: 35.9012230317
+
+We recommend leaving the cpus at 1 since you're going to be running 1 command on a cpu (this will give the best performance).  You can choose your own seed and exhaustiveness as you see fit.  You obviously need to change the center and size values for your receptor, the path to the receptor, the path to the output file, and the path to autodock vina. 
+
+5 At this point, you have a file with all the commands to run for your virtual screen!  You need to run the commands, gather up the results, and do so post-processing to find the ones you want.  To run the whole screen, I use xjobs.  I start one job per physical CPU core in my computer.  I do NOT start one per thread, as that can slow down the performance.  Thus, if my computer's CPU has 10 cores/20 threads, I start 10 jobs.  
+
+Coming soon: the command to run the screen using xjobs
+
+Caveat: I have my own modified version of autodock vina that only spits out a single value (the best score from the run).  Using the default version of autodock vina, you get a whole lot of data that you then need to do some additional post-processing to in order to use my programs that get you the compounds with a score of at least some value.  
+
+
+================================================================================
+
+Programs coming in the future:
+1 - gather_results.py: This program sweeps up all the results into one big text file that you can then easily sort through the command line so you can grab  the top x compounds with the head command or use the find_best.py program to find all compounds with a score of y or better.
+
+2 - find_best.py Finds the compounds with a score of y or better.
+
+3 - recovery.py: You can run this program if the screen is stopped before it is completed due to a power outage, etc.  This program looks at the file that has all the commands for the screen and deletes the commands that have already been successfully run (i.e. commands for which the OUTZINCxyz.pdbqt files exists).  This allows you to restart the screen where it left off and not have to start it from scratch.  
+
+
 

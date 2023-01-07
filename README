@@ -34,7 +34,7 @@ Note that these scripts were written by my students and updated a bit by me.  Th
 
 We recommend leaving the cpus at 1 since you're going to be running 1 command on a cpu (this will give the best performance).  You can choose your own seed and exhaustiveness as you see fit.  You obviously need to change the center and size values for your receptor, the path to the receptor, the path to the output file, and the path to autodock vina. 
 
-5 At this point, you have a file with all the commands to run for your virtual screen!  You need to run the commands, gather up the results, and do so post-processing to find the ones you want.  To run the whole screen, I use xjobs.  I start one job per physical CPU core in my computer.  I do NOT start one per thread, as that can slow down the performance.  Thus, if my computer's CPU has 10 cores/20 threads, I start 10 jobs.  
+5 At this point, you have a file with all the commands to run for your virtual screen!  You need to run the commands, gather up the results, and do so post-processing to find the ones you want.  To run the whole screen, I use xjobs (http://www.maier-komor.de/xjobs.html), although you could also use parallel.  I start one job per physical CPU core in my computer.  I do NOT start one per thread, as that can slow down the performance.  Thus, if my computer's CPU has 10 cores/20 threads, I start 10 jobs.  
 
 Coming soon: the command to run the screen using xjobs
 

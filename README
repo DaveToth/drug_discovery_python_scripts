@@ -1,4 +1,4 @@
-Updated Jan 7, 2023 by David Toth (david.toth@centre.edu)
+Updated Jan 8, 2023 by David Toth (david.toth@centre.edu)
 
 The files in this repo are used to conduct several aspects of virtual screens for drug discovery.  
 
@@ -34,21 +34,10 @@ Note that these scripts were written by my students and updated a bit by me.  Th
 
 We recommend leaving the cpus at 1 since you're going to be running 1 command on a cpu (this will give the best performance).  You can choose your own seed and exhaustiveness as you see fit.  You obviously need to change the center and size values for your receptor, the path to the receptor, the path to the output file, and the path to autodock vina. 
 
-5 At this point, you have a file with all the commands to run for your virtual screen!  You need to run the commands, gather up the results, and do so post-processing to find the ones you want.  To run the whole screen, I use xjobs (http://www.maier-komor.de/xjobs.html), although you could also use parallel.  I start one job per physical CPU core in my computer.  I do NOT start one per thread, as that can slow down the performance.  Thus, if my computer's CPU has 10 cores/20 threads, I start 10 jobs.  
+5 At this point, you have a file (let's assume it's called commands.txt) with all the commands to run for your virtual screen!  You need to run the commands, gather up the results, and do so post-processing to find the ones you want.  To run the whole screen, I use xjobs (http://www.maier-komor.de/xjobs.html), although you could also use gnu parallel.  I start one job per physical CPU core in my computer.  I do NOT start one per thread, as that can slow down the performance.  Thus, if my computer's CPU has 10 cores/20 threads, I start 10 jobs.  
 
-Coming soon: the command to run the screen using xjobs
+The command to run the screen using xjobs, assuming that the file with all the commands is commands.txt and that we have 10 CPU cores: nohup xjobs -j 10 -s commands.txt &
 
-Caveat: I have my own modified version of autodock vina that only spits out a single value (the best score from the run).  Using the default version of autodock vina, you get a whole lot of data that you then need to do some additional post-processing to in order to use my programs that get you the compounds with a score of at least some value.  
+6 If there's a power failure or something else that causes the screen to stop part of the way through, you'll want to restart it in such a way that it only does the things left to do instead of starting all over again.  The recovery.py program helps with this. This program looks at the file that has all the commands for the screen (assume it's commands.txt) and deletes the commands that have already been successfully run (i.e. commands for which the OUTZINCxyz.pdbqt files exists).  Then restarting the screen with xjobs will start the screen from where it left off.
 
-
-================================================================================
-
-Programs coming in the future:
-1 - gather_results.py: This program sweeps up all the results into one big text file that you can then easily sort through the command line so you can grab  the top x compounds with the head command or use the find_best.py program to find all compounds with a score of y or better.
-
-2 - find_best.py Finds the compounds with a score of y or better.
-
-3 - recovery.py: You can run this program if the screen is stopped before it is completed due to a power outage, etc.  This program looks at the file that has all the commands for the screen and deletes the commands that have already been successfully run (i.e. commands for which the OUTZINCxyz.pdbqt files exists).  This allows you to restart the screen where it left off and not have to start it from scratch.  
-
-
-
+7 Once your screen is complete, you'll want to gather up the results and be able to pull out the top x compounds or the compounds with scores of y or better.  While I have programs to do this, there's one small snag: I have my own modified version of autodock vina that only spits out a single value (the best score from the run).  Using the default version of autodock vina, you get a whole lot of data that you then need to do some additional post-processing to in order to use my programs that get you the compounds with a score of at least some value.  Thus, if you're using the vanilla version of autodock vina, you won't be able to use my programs easily, so I haven't included them.  
